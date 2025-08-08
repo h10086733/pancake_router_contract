@@ -19,7 +19,7 @@ module.exports = {
     hardhat: {
       forking: {
         url: "https://neat-practical-arrow.bsc.quiknode.pro/b2f485b14431f07a8e9e25951ad16fb364a0dd3a",
-        enabled: true,
+        enabled: true
       },
       chainId: 56,
       allowUnlimitedContractSize: true,
