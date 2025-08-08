@@ -1,10 +1,10 @@
 {
   "network": "bsc",
   "chainId": 56,
-  "contractAddress": "0x41911355B713662B662a255ca1c1670bDA91b4b2",
+  "contractAddress": "0x1dfc5a584E70e4B366C46918d41A758b06e1E50f",
   "deployer": "0xc66B246B816f3eDf5b26851F03A96E15C4C6395f",
-  "deploymentTime": "2025-08-08T06:36:19.397Z",
-  "transactionHash": "0x7d1fb81e5bce8f2ad162f1caf12d4c0a84e79e3f929b71b007110353e94c3d7b",
+  "deploymentTime": "2025-08-08T10:45:24.001Z",
+  "transactionHash": "0x2f34b10bdcd091ed8455209e290e8a036f2f275c61b423a8c2c1949947232570",
   "deployParams": {
     "pancakeRouterV2": "0x10ED43C718714eb63d5aA57B78B54704E256024E",
     "pancakeRouterV3": "0x1b81D678ffb9C0263b24A97847620C99d213eB14",
