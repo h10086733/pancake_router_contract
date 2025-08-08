@@ -8,8 +8,11 @@ module.exports = {
     settings: {
       optimizer: {
         enabled: true,
-        runs: 200,
+        runs: 200,  // 平衡部署成本和运行效率的最佳设置
       },
+      metadata: {
+        bytecodeHash: "none"  // 减少字节码大小
+      }
     },
   },
   networks: {

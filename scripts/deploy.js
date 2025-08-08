@@ -28,13 +28,6 @@ async function main() {
     const balance = await ethers.provider.getBalance(deployer.address);
     console.log(`💰 账户余额: ${ethers.formatEther(balance)} BNB`);
 
-    // 检查余额
-    const minBalance = networkName === "bscTestnet" ? "0.01" : "0.1";
-    if (balance < ethers.parseEther(minBalance)) {
-      console.error(`❌ 账户余额不足，需要至少 ${minBalance} BNB 进行部署`);
-      process.exit(1);
-    }
-
     // 网络配置
     const NETWORK_CONFIG = {
       bsc: {
@@ -93,14 +86,64 @@ async function main() {
     const OptimizedPancakeRouter = await ethers.getContractFactory("OptimizedPancakeRouter");
     console.log("✅ 合约工厂获取成功");
 
-    // 开始部署
-    console.log("🔨 开始部署合约...");
-    const router = await OptimizedPancakeRouter.deploy(
+    // 预估部署 gas 费用
+    console.log("\n💰 预估部署费用...");
+    const deployTx = await OptimizedPancakeRouter.getDeployTransaction(
       deployParams.pancakeRouterV2,
       deployParams.pancakeRouterV3,
       deployParams.weth,
       deployParams.feeRate,
       deployParams.feeRecipient
+    );
+
+    const gasEstimate = await ethers.provider.estimateGas(deployTx);
+    console.log(`⛽ 预估 Gas 使用量: ${gasEstimate.toLocaleString()}`);
+
+    // 获取当前 gas 价格
+    let currentGasPrice;
+    try {
+      const feeData = await ethers.provider.getFeeData();
+      currentGasPrice = feeData.gasPrice || ethers.parseUnits("5", "gwei");
+    } catch (error) {
+      currentGasPrice = ethers.parseUnits("5", "gwei"); // 默认 5 Gwei
+    }
+    console.log(`⛽ 当前 Gas 价格: ${ethers.formatUnits(currentGasPrice, "gwei")} Gwei`);
+
+    // 计算部署成本
+    const estimatedCost = gasEstimate * currentGasPrice;
+    const estimatedCostBNB = ethers.formatEther(estimatedCost);
+    console.log(`💸 预估部署成本: ${estimatedCostBNB} BNB`);
+
+    // 检查余额是否充足
+    const currentBalance = await ethers.provider.getBalance(deployer.address);
+    const balanceBNB = ethers.formatEther(currentBalance);
+    console.log(`💰 当前账户余额: ${balanceBNB} BNB`);
+
+    // 安全余量检查 (预估成本的 150%)
+    const safetyMargin = estimatedCost * 3n / 2n;
+    if (currentBalance < safetyMargin) {
+      const requiredBNB = ethers.formatEther(safetyMargin);
+      console.error(`❌ 余额不足！需要至少 ${requiredBNB} BNB (包含 50% 安全余量)`);
+      console.error(`   当前余额: ${balanceBNB} BNB`);
+      console.error(`   预估成本: ${estimatedCostBNB} BNB`);
+      console.error(`   建议余额: ${requiredBNB} BNB`);
+      process.exit(1);
+    }
+
+    console.log("✅ 余额充足，继续部署...");
+
+    // 开始部署
+    console.log("\n🔨 开始部署合约...");
+    const router = await OptimizedPancakeRouter.deploy(
+      deployParams.pancakeRouterV2,
+      deployParams.pancakeRouterV3,
+      deployParams.weth,
+      deployParams.feeRate,
+      deployParams.feeRecipient,
+      {
+        gasLimit: gasEstimate + 50000n, // 增加一些余量
+        gasPrice: currentGasPrice
+      }
     );
 
     console.log("⏳ 等待部署交易确认...");
