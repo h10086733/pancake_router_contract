@@ -35,7 +35,7 @@ module.exports = {
         mnemonic: "test test test test test test test test test test test junk"
       }
     },
-    bscTestnet: {
+    test: {
       url: "https://bsc-testnet-rpc.publicnode.com",
       chainId: 97,
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : {
